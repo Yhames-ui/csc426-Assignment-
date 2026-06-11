@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f4f8;
+    font-family: Arial, sans-serif;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px 36px;
+    width: 380px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.10);
+  }
+  h1 { font-size: 26px; color: #1e293b; margin-bottom: 6px; }
+  .subtitle { color: #64748b; font-size: 14px; margin-bottom: 28px; }
+
+  label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+  .field { margin-bottom: 18px; }
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #1e293b;
+    outline: none;
+    transition: border 0.2s;
+  }
+  input:focus { border-color: #2563eb; }
+  input.error-input { border-color: #dc2626; }
+
+  .error-msg { color: #dc2626; font-size: 12px; margin-top: 5px; display: none; }
+  .error-msg.show { display: block; }
+
+  .actions { display: flex; gap: 10px; margin-top: 8px; }
+  .btn-login {
+    flex: 1;
+    padding: 13px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-login:hover { background: #1d4ed8; }
+  .btn-reset {
+    padding: 13px 20px;
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-reset:hover { background: #e2e8f0; }
+
+  .toast {
+    margin-top: 20px;
+    padding: 13px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: none;
+    text-align: center;
+  }
+  .toast.success { background: #dcfce7; color: #166534; display: block; }
+  .toast.fail    { background: #fee2e2; color: #991b1b; display: block; }
+
+  .hint { font-size: 12px; color: #94a3b8; text-align: center; margin-top: 18px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Welcome back</h1>
+  <p class="subtitle">Sign in to your account</p>
+
+  <div class="field">
+    <label for="username">Username</label>
+    <input type="text" id="username" placeholder="Enter your username">
+    <div class="error-msg" id="username-err">Username is required.</div>
+  </div>
+
+  <div class="field">
+    <label for="password">Password</label>
+    <input type="password" id="password" placeholder="Enter your password">
+    <div class="error-msg" id="password-err">Password must be at least 6 characters.</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-login" onclick="login()">Login</button>
+    <button class="btn-reset" onclick="reset()">Reset</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <p class="hint">Demo: username <strong>admin</strong> · password <strong>123456</strong></p>
+</div>
+
+<script>
+  function login() {
+    const u = document.getElementById('username');
+    const p = document.getElementById('password');
+    const uErr = document.getElementById('username-err');
+    const pErr = document.getElementById('password-err');
+    const toast = document.getElementById('toast');
+
+    // Clear previous state
+    [u, p].forEach(el => el.classList.remove('error-input'));
+    [uErr, pErr].forEach(el => el.classList.remove('show'));
+    toast.className = 'toast';
+
+    let valid = true;
+
+    if (!u.value.trim()) {
+      u.classList.add('error-input');
+      uErr.classList.add('show');
+      valid = false;
+    }
+    if (p.value.length < 6) {
+      p.classList.add('error-input');
+      pErr.classList.add('show');
+      valid = false;
+    }
+    if (!valid) return;
+
+    // Simple demo check
+    if (u.value.trim() === 'admin' && p.value === '123456') {
+      toast.textContent = '✓ Login successful! Welcome, ' + u.value.trim() + '.';
+      toast.className = 'toast success';
+    } else {
+      toast.textContent = '✗ Incorrect username or password.';
+      toast.className = 'toast fail';
+    }
+  }
+
+  function reset() {
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    ['username','password'].forEach(id => {
+      document.getElementById(id).classList.remove('error-input');
+    });
+    document.getElementById('username-err').classList.remove('show');
+    document.getElementById('password-err').classList.remove('show');
+    document.getElementById('toast').className = 'toast';
+  }
+
+  // Allow Enter key to submit
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculator</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f4f8;
+    font-family: Arial, sans-serif;
+  }
+  .calc {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 24px;
+    width: 320px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .display {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 20px 16px 12px;
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .display .expr {
+    color: #64748b;
+    font-size: 14px;
+    min-height: 20px;
+    margin-bottom: 6px;
+    word-break: break-all;
+  }
+  .display .result {
+    color: #f1f5f9;
+    font-size: 36px;
+    font-weight: bold;
+    word-break: break-all;
+  }
+  .buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  button {
+    padding: 18px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.1s;
+  }
+  button:active { transform: scale(0.93); opacity: 0.8; }
+  .btn-num  { background: #334155; color: #f1f5f9; }
+  .btn-op   { background: #1d4ed8; color: #fff; }
+  .btn-eq   { background: #2563eb; color: #fff; grid-column: span 2; }
+  .btn-clear{ background: #dc2626; color: #fff; }
+  .btn-zero { grid-column: span 2; }
+</style>
+</head>
+<body>
+<div class="calc">
+  <div class="display">
+    <div class="expr" id="expr"></div>
+    <div class="result" id="result">0</div>
+  </div>
+  <div class="buttons">
+    <button class="btn-clear" onclick="clearAll()">C</button>
+    <button class="btn-op"    onclick="append('%')">%</button>
+    <button class="btn-op"    onclick="append('^')">^</button>
+    <button class="btn-op"    onclick="append('/')">÷</button>
+
+    <button class="btn-num"   onclick="append('7')">7</button>
+    <button class="btn-num"   onclick="append('8')">8</button>
+    <button class="btn-num"   onclick="append('9')">9</button>
+    <button class="btn-op"    onclick="append('*')">×</button>
+
+    <button class="btn-num"   onclick="append('4')">4</button>
+    <button class="btn-num"   onclick="append('5')">5</button>
+    <button class="btn-num"   onclick="append('6')">6</button>
+    <button class="btn-op"    onclick="append('-')">−</button>
+
+    <button class="btn-num"   onclick="append('1')">1</button>
+    <button class="btn-num"   onclick="append('2')">2</button>
+    <button class="btn-num"   onclick="append('3')">3</button>
+    <button class="btn-op"    onclick="append('+')">+</button>
+
+    <button class="btn-num btn-zero" onclick="append('0')">0</button>
+    <button class="btn-num"   onclick="append('.')">.</button>
+    <button class="btn-eq"    onclick="calculate()">=</button>
+  </div>
+</div>
+
+<script>
+  let expr = '';
+
+  function append(val) {
+    expr += val;
+    document.getElementById('expr').textContent = expr;
+    document.getElementById('result').textContent = expr;
+  }
+
+  function clearAll() {
+    expr = '';
+    document.getElementById('expr').textContent = '';
+    document.getElementById('result').textContent = '0';
+  }
+
+  function calculate() {
+    try {
+      // Replace ^ with ** for power
+      let sanitized = expr.replace(/\^/g, '**');
+      // Handle % as /100
+      sanitized = sanitized.replace(/(\d+)%/g, '($1/100)');
+      let ans = Function('"use strict"; return (' + sanitized + ')')();
+      document.getElementById('expr').textContent = expr + ' =';
+      document.getElementById('result').textContent = parseFloat(ans.toFixed(10));
+      expr = String(parseFloat(ans.toFixed(10)));
+    } catch {
+      document.getElementById('result').textContent = 'Error';
+      expr = '';
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if ('0123456789.+-*/'.includes(e.key)) append(e.key);
+    else if (e.key === 'Enter' || e.key === '=') calculate();
+    else if (e.key === 'Backspace') { expr = expr.slice(0,-1); document.getElementById('result').textContent = expr || '0'; document.getElementById('expr').textContent = expr; }
+    else if (e.key === 'Escape') clearAll();
+    else if (e.key === '%') append('%');
+    else if (e.key === '^') append('^');
+  });
+</script>
+</body>
+</html>
